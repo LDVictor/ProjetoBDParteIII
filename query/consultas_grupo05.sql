@@ -3,6 +3,10 @@ REM   Grupo: Gabriel Souto Maracaja, Gilvan Neto, Lucas Fernandes de Oliveira, P
 
 #01. Crie uma visão que liste os valores de chuva diários do mês atual e o nome do usuário responsável pela medição.
 
+CREATE VIEW infoChuvas
+	AS SELECT m.valor_chuva_dia, u.nome
+	FROM medicao_pluviometrica m, usuario u,
+	WHERE m.matricula = u.matricula
 
 #02. Liste os nomes dos postos pluviométricos e seu município, agrupados pelo município.
 
@@ -25,6 +29,12 @@ WHERE e.id_rio = r.id_rio AND p.id_bacia = r.id_bacia AND p.estado = "Ceará"
 
 #05. Crie uma visão que liste, para todos os açudes, seu nome e os valores de ph, dbo, turbidez, oxigênio, alcalinidade e a data de medições que foram feitas no mês atual.
 
+CREATE VIEW InfoAcude
+	AS SELECT r.nome, e.pH_rio, e.DBO_rio, e.turbidez_rio, e.oxigenio_rio, e.alcalinidade_rio, e.data_medicao_acude,
+	FROM rio r, estacaoDeQualidade e
+	WHERE r.id_rio = e.id_rio
+
+	
 
 #06. Liste os valores de oxigênio medidos para o Rio Paraíba entre os dias 02/07/2017 e 02/08/2017.
 
