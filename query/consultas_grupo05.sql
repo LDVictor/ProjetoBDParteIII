@@ -54,7 +54,7 @@ ORDER BY nome ASC
 SELECT a.nome , COUNT(m.*)
 FROM acude a, medicao_cota_diaria m
 WHERE a.id_acude = m.id_acude
-ORDER BY a.nome ASC
+GROUP BY a.nome
 
 #09. Liste os nomes dos açudes e o nome do rio pertencente, agrupados pelo nome do rio.
 
@@ -85,7 +85,7 @@ HAVING MAX(COUNT(m.*))
 SELECT e.pH_acude
 FROM estacaoDeQualidade e, acude a
 WHERE e.idAcude = a.idAcude AND a.nome = "Bodocongó"
-ORDER BY e.pH_acude ASC
+ORDER BY e.pH_acude DESC
 
 #14. Liste o nome dos usuários que não cadastraram nenhuma medição, seja ela pluviométrica ou de cota diária.
 
