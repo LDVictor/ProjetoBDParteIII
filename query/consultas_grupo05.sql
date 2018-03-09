@@ -1,104 +1,91 @@
 -- Consultas
 
---01. Crie uma visão que liste os valores de chuva diários do mês atual e o nome do usuário responsável pela medição.
+--01. Crie uma visÃ£o que liste os valores de chuva diÃ¡rios do mÃªs atual e o nome do usuÃ¡rio responsÃ¡vel pela mediÃ§Ã£o.
 
 CREATE VIEW infoChuvas
 	AS SELECT m.valor_chuva_dia, u.nome
 	FROM medicao_pluviometrica m, usuario u
-	WHERE m.matricula = u.matricula
+	WHERE m.matricula = u.matricula AND TO_CHAR(m.data_medicao, 'MM-YYYY') = TO_CHAR(SYSDATE, 'MM-YYYY');
 
---02. Liste os nomes dos postos pluviométricos e seu município, agrupados pelo município.
+--02. Liste os nomes dos postos pluviomÃ©tricos e seu municÃ­pio, agrupados pelo municÃ­pio.
 
-SELECT nome, municipio
-FROM posto_pluviometrico
-GROUP BY municipio
+SELECT p.nome, p.municipio
+FROM posto_pluviometrico p
+GROUP BY p.municipio, p.nome;
 
---03. Faça um trigger que não permita a inserção de uma medição de cota diária de um açude para uma data posterior a data atual.
-
-
---04. Liste o nome da estações de qualidade que mediram informações de rios da Paraíba ou do Ceará.
+--04. Liste o nome da estaÃ§Ãµes de qualidade que mediram informaÃ§Ãµes de rios da ParaÃ­ba ou do CearÃ¡.
 
 SELECT e.nome
 FROM estacaoDeQualidade e, rio r, posto_pluviometrico p
-WHERE e.id_rio = r.id_rio AND p.id_bacia = r.id_bacia AND p.estado = 'Paraíba'
-UNION
-SELECT e.nome
-FROM estacaoDeQualidade e, rio r, posto_pluviometrico p
-WHERE e.id_rio = r.id_rio AND p.id_bacia = r.id_bacia AND p.estado = 'Ceará'
+WHERE e.id_rio = r.id_rio AND p.id_bacia = r.id_bacia AND (p.estado = 'PB' OR p.estado = 'CE');
 
---05. Crie uma visão que liste, para todos os açudes, seu nome e os valores de ph, dbo, turbidez, oxigênio, alcalinidade e a data de medições que foram feitas no mês atual.
+--05. Crie uma visÃ£o que liste, para todos os aÃ§udes, seu nome e os valores de ph, dbo, turbidez, oxigÃªnio, alcalinidade e a data de mediÃ§Ãµes que foram feitas no mÃªs atual.
 
 CREATE VIEW InfoAcude
-	AS SELECT r.nome, e.pH_rio, e.DBO_rio, e.turbidez_rio, e.oxigenio_rio, e.alcalinidade_rio, e.data_medicao_acude
-	FROM rio r, estacaoDeQualidade e
-	WHERE r.id_rio = e.id_rio
+	AS SELECT a.nome, e.pH_acude, e.DBO_acude, e.turbidez_acude, e.oxigenio_acude, e.alcalinidade_acude, e.data_medicao_acude
+	FROM acude a, estacaoDeQualidade e
+	WHERE a.id_acude = e.id_acude AND TO_CHAR(e.data_medicao_acude, 'MM-YYYY') = TO_CHAR(SYSDATE, 'MM-YYYY');
 
---06. Liste os valores de oxigênio medidos para o Rio Paraíba entre os dias 02/07/2017 e 02/08/2017.
+--06. Liste os valores de oxigÃªnio medidos para o Rio ParaÃ­ba entre os dias 02/07/2017 e 02/08/2017.
 
-SELECT e.oxigenio_rio
+SELECT e.oxigenio_rio AS oxigenio_rio_paraiba, e.data_medicao_rio
 FROM estacaoDeQualidade e, rio r
-WHERE r.id_rio = e.id_rio AND r.nome = 'Rio Paraíba' AND data_medicao_rio BETWEEN '2017-07-02' AND '2017-08-02'
+WHERE r.id_rio = e.id_rio AND r.nome = 'Rio ParaÃ­ba' AND e.data_medicao_rio BETWEEN '07-02-2017' AND '08-02-2017';
 
---07. Liste o nome das estações de qualidade, ordenadas pelo código da estação e por seu nome de forma crescente.
+--07. Liste o nome das estaÃ§Ãµes de qualidade, ordenadas pelo cÃ³digo da estaÃ§Ã£o e por seu nome de forma crescente.
 
 SELECT nome
 FROM estacaoDeQualidade
---GROUP BY id_estacao
-ORDER BY id_estacao ASC, nome ASC
+ORDER BY id_estacao_qualidade ASC, nome ASC;
 
---08. Liste a quantidade de medições de cota diária feitas por açude.
+--08. Liste a quantidade de mediÃ§Ãµes de cota diÃ¡ria feitas por aÃ§ude.
 
-SELECT a.nome , COUNT(m.*)
+SELECT a.nome , COUNT(*) AS qte_medicoes
 FROM acude a, medicao_cota_diaria m
 WHERE a.id_acude = m.id_acude
-GROUP BY a.nome
+GROUP BY a.nome;
 
---09. Liste os nomes dos açudes e o nome do rio pertencente, agrupados pelo nome do rio.
+--09. Liste os nomes dos aÃ§udes e o nome do rio pertencente, agrupados pelo nome do rio.
 
 SELECT a.nome, r.nome
 FROM acude a, rio r
-WHERE r.idRio = a.idRio
-GROUP BY r.nome
+WHERE r.id_rio = a.id_rio
+GROUP BY r.nome, a.nome;
 
---10. Faça um trigger que, ao tentar inserir um valor de chuva negativo, o valor inserido seja 0.
+--11. Qual foi o valor total de chuvas no aÃ§ude de Coremas para os meses de Dezembro/2017 e Janeiro/2018 ?
 
+SELECT SUM(m.cota_atual) AS total_chuvas_acude_coremas
+FROM medicao_cota_diaria m, acude a
+WHERE a.id_acude = m.id_acude AND a.nome = 'Coremas' AND m.data_medicao BETWEEN '12-01-2017' AND '01-31-2018';
 
---11. Qual foi o valor total de chuvas no açude de Coremas para os meses de Dezembro/2017 e Janeiro/2018 ?
+--12. Qual o nome do usuÃ¡rio que mais realizou mediÃ§Ãµes de cotas diÃ¡rias, e quantas foram?.
 
-SELECT SUM(m.valor_chuva_dia)
-FROM medicao_pluviometrica m, acude a
-WHERE a.idAcude = m.idAcude AND a.nome = 'Coremas' AND m.data BETWEEN '2017-12-01' AND '2018-01-31' 
+SELECT *
+FROM (SELECT u.nome, COUNT(*) AS qte_medicoes
+      FROM usuario u, medicao_cota_diaria m
+      WHERE u.matricula = m.matricula
+      GROUP BY u.nome
+      ORDER BY qte_medicoes DESC)
+WHERE ROWNUM = 1;
 
---12. Qual o nome do usuário que mais realizou medições de cotas diárias, e quantas foram?.
+--13. Liste os valores de pH pro aÃ§ude de BodocongÃ³, ordenadas de forma decrescente.
 
-SELECT u.nome, COUNT(m.*) AS qte_medicoes_usuario
-FROM usuario u, medicao_cota_diaria m
-WHERE m.matricula = u.matricula
-GROUP BY u.nome
-HAVING MAX(qte_medicoes_usuario)
-
---13. Liste os valores de pH pro açude de Bodocongó, ordenadas de forma decrescente.
-
-SELECT e.pH_acude
+SELECT e.pH_acude AS pH_acude_bodocongo
 FROM estacaoDeQualidade e, acude a
-WHERE e.idAcude = a.idAcude AND a.nome = 'Bodocongó'
-ORDER BY e.pH_acude DESC
+WHERE e.id_acude = a.id_acude AND a.nome = 'BodocongÃ³'
+ORDER BY e.pH_acude DESC;
 
---14. Liste o nome dos usuários que não cadastraram nenhuma medição, seja ela pluviométrica ou de cota diária.
+--14. Liste o nome dos usuÃ¡rios que nÃ£o cadastraram nenhuma mediÃ§Ã£o, seja ela pluviomÃ©trica ou de cota diÃ¡ria.
 
-SELECT u.nome
-FROM usuario u, medicao_pluviometrica p, medicao_cota_diaria c
+SELECT u.nome AS nao_cadastraram_medicao
+FROM usuario u
 WHERE NOT EXISTS (SELECT u.matricula
-                  FROM medicao_pluviometrica pp
-                  WHERE u.matricula = pp.matricula
-                  UNION
-                  SELECT u.matricula
-                  FROM medicao_cota_diara cc
-                  WHERE u.matricula = cc.matricula)       
+                  FROM medicao_pluviometrica pp, medicao_cota_diaria cc
+                  WHERE u.matricula = pp.matricula OR u.matricula = cc.matricula);
                 
---15. Qual o açude com o menor comprimento?
+--15. Qual o aÃ§ude com o menor comprimento?
 
-SELECT a.nome
+SELECT a.nome AS acude_com_menor_comprimento
 FROM acude a
 WHERE a.comprimento = (SELECT MIN(a.comprimento)
-                        FROM acude a)
+                        FROM acude a);
