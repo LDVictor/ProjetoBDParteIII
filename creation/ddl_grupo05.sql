@@ -1,5 +1,4 @@
-REM   Projeto Logico usando o Modelo Relacional do Oracle - Script SQL-DDL
-REM   Grupo: Gabriel Souto Maracaja, Gilvan Neto, Lucas Fernandes de Oliveira, Pedro Henrique Costa, Raquel Rufino e Victor Emanuel Farias
+-- Create
 
 -- Bacia
 CREATE TABLE bacia (         
@@ -35,7 +34,7 @@ CREATE TABLE usuario (
 CREATE TABLE medicao_pluviometrica (       
     id_medicao NUMBER,       
     data_medicao DATE NOT NULL,       
-    valor_chuva_dia NUMBER(9,2),            
+    valor_chuva_dia NUMBER(9,2),     
     id_posto_pluviometrico NUMBER,       
     matricula NUMBER,       
     PRIMARY KEY (id_medicao, matricula),      
@@ -129,4 +128,3 @@ CREATE TABLE estacaoDeQualidade(
     FOREIGN KEY (id_rio) REFERENCES rio(id_rio),     
     FOREIGN KEY (id_acude) REFERENCES acude(id_acude)     
 );
-
