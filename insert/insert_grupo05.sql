@@ -27,7 +27,7 @@ INSERT INTO medicao_pluviometrica VALUES (3, "03-30-2016", 3500, 2, 200134657);
 --Novos Inserts
 INSERT INTO medicao_pluviometrica VALUES (4, "04-05-2015", 4350, 4, 114211198);
 INSERT INTO medicao_pluviometrica VALUES (5, "08-07-2016", 5800, 5, 112041940);
-INSERT INTO medicao_pluviometrica VALUES (6, "08-07-2016", 1440, 6, 112041940);
+INSERT INTO medicao_pluviometrica VALUES (6, "09-07-2016", 1440, 6, 112041940);
 
 INSERT INTO rio VALUES (1, "Rio Amazonas", "C", 1);
 INSERT INTO rio VALUES (2, "Rio Negro", "Q", 1);
